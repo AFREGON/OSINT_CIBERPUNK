@@ -14,7 +14,7 @@ Una herramienta desarrollada en HTML para facilitar la generación de búsquedas
 
 ## 🛠️ ¿Cómo usar?
 
-1. Abre el archivo `index.html` en tu navegador.
+1. Abre el archivo `OSINT CIBERPUNK` en tu navegador.
 2. Escribe palabras clave y selecciona los dorks deseados.
 3. Haz clic en "Generar búsqueda" y ejecuta el enlace resultante.
 4. Guarda búsquedas que quieras reutilizar.
