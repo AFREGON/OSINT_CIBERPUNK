@@ -19,9 +19,6 @@ Una herramienta desarrollada en HTML para facilitar la generación de búsquedas
 3. Haz clic en "Generar búsqueda" y ejecuta el enlace resultante.
 4. Guarda búsquedas que quieras reutilizar.
 
-## 📂 Captura de pantalla
-
-> Puedes incluir una imagen aquí mostrando la herramienta en acción.
 
 ## ⚠️ Aviso de uso
 
