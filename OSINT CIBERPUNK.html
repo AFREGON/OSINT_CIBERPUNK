@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSINT Ciberpunk Google Dorker</title>
+  <style>
+    body { background: #0d0d0d; color: #00ffcc; font-family: 'JetBrains Mono', monospace; padding: 20px; }
+    h1 { text-align: center; color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+    .container { max-width: 800px; margin: auto; padding: 20px; background: #111; border: 2px solid #00ffff; border-radius: 10px; box-shadow: 0 0 15px #00ffcc88; }
+    label { display: block; margin-top: 15px; }
+    input[type="text"], select { width: 100%; padding: 10px; background: #000; color: #0f0; border: 1px solid #0ff; border-radius: 5px; margin-top: 5px; }
+    details { margin: 10px 0; border: 1px solid #00ffcc; border-radius: 5px; }
+    summary { cursor: pointer; padding: 10px; background: #222; color: #00ffcc; font-weight: bold; }
+    .dork-option { margin: 5px 0; display: flex; flex-direction: column; padding: 5px 10px; }
+    .dork-label { display: flex; align-items: center; gap: 10px; }
+    .dork-desc { font-size: 0.9em; color: #888; margin-left: 24px; margin-top: 2px; }
+    .actions { margin-top: 20px; }
+    button { margin: 5px 5px 0 0; padding: 10px 20px; background: #00ffcc; color: #000; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 0 10px #00ffcc; }
+    button:hover { background: #00ffaa; }
+    .result { margin-top: 20px; padding: 10px; background: #222; color: #0f0; border: 1px solid #0ff; border-radius: 5px; transition: opacity 0.3s ease; opacity: 0; }
+    .result.visible { opacity: 1; }
+    .favorites { margin-top: 20px; background: #1a1a1a; padding: 10px; border: 1px dashed #00ffcc; }
+    .favorites li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .favorites button { background: transparent; color: #ff6666; border: 1px solid #ff6666; padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+    .favorites button:hover { background: #ff6666; color: #000; }
+    footer { margin-top: 40px; text-align: center; color: #555; font-size: 0.8em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>OSINT CIBERPUNK GOOGLE DORKER</h1>
+    <p style="text-align:center;">Explora Google como un analista real</p>
+    <label for="keywords">Palabras clave:</label>
+    <input type="text" id="keywords" aria-label="Palabras clave">
+    <label for="keywordFilter">Filtrado de palabras clave:</label>
+    <select id="keywordFilter" aria-label="Filtrado de palabras clave">
+      <option value="exact">Frase exacta</option>
+      <option value="any">Cualquiera de estas palabras</option>
+      <option value="all">Todas estas palabras</option>
+    </select>
+    <label>Selecciona Google Dorks:</label>
+    <details>
+      <summary>Principales</summary>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="site:"><span>site:</span><input type="text" placeholder="example.com"></div>
+        <div class="dork-desc">Restringe resultados a un dominio específico.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="intitle:"><span>intitle:</span><input type="text" placeholder="login"></div>
+        <div class="dork-desc">Filtra páginas que contienen la palabra en el título.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="inurl:"><span>inurl:</span><input type="text" placeholder="admin"></div>
+        <div class="dork-desc">Busca páginas con la palabra en la URL.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Contenido y enlaces</summary>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="intext:"><span>intext:</span><input type="text" placeholder="contraseña"></div>
+        <div class="dork-desc">Busca la palabra en el contenido de la página.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="allintext:"><span>allintext:</span><input type="text" placeholder="user login"></div>
+        <div class="dork-desc">Todas las palabras deben aparecer en el contenido.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="link:"><span>link:</span><input type="text" placeholder="example.com"></div>
+        <div class="dork-desc">Encuentra páginas que enlazan a la URL indicada.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="inanchor:"><span>inanchor:</span><input type="text" placeholder="login"></div>
+        <div class="dork-desc">Palabras en el texto de enlaces entrantes.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Archivos y caché</summary>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="filetype:"><span>filetype:</span><input type="text" placeholder="pdf"></div>
+        <div class="dork-desc">Muestra solo archivos del tipo especificado.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="cache:"><span>cache:</span><input type="text" placeholder="example.com"></div>
+        <div class="dork-desc">Accede a la versión en caché de Google.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Títulos y URL completas</summary>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="allintitle:"><span>allintitle:</span><input type="text" placeholder="administrador"></div>
+        <div class="dork-desc">Todas las palabras deben aparecer en el título.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="allinurl:"><span>allinurl:</span><input type="text" placeholder="config"></div>
+        <div class="dork-desc">Todas las palabras deben aparecer en la URL.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="allinanchor:"><span>allinanchor:</span><input type="text" placeholder="admin user"></div>
+        <div class="dork-desc">Todas las palabras en texto de enlaces entrantes.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Temporal</summary>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="before:"><span>before:</span><input type="text" placeholder="2021-01-01"></div>
+        <div class="dork-desc">Resultados publicados antes de la fecha.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="after:"><span>after:</span><input type="text" placeholder="2020-01-01"></div>
+        <div class="dork-desc">Resultados publicados después de la fecha.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="around:"><span>around(X):</span><input type="text" placeholder="5"></div>
+        <div class="dork-desc">Palabras con proximidad máxima X.</div>
+      </div>
+      <div class="dork-option">
+        <div class="dork-label"><input type="checkbox" value="daterange:"><span>daterange:</span><input type="text" placeholder="2459215-2459275"></div>
+        <div class="dork-desc">Resultados dentro de un rango de fechas (Julian).</div>
+      </div>
+    </details>
+    <details>
+      <summary>Ubicación</summary>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="loc:"><span>loc:</span><input type="text" placeholder="Madrid"></div><div class="dork-desc">Filtra resultados por ubicación.</div></div>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="country:"><span>country:</span><input type="text" placeholder="ES"></div><div class="dork-desc">Filtra resultados por país (ISO).</div></div>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="maps:"><span>maps:</span><input type="text" placeholder="Paris"></div><div class="dork-desc">Integra Google Maps para ubicación específica.</div></div>
+    </details>
+    <details>
+      <summary>Noticias y blogs</summary>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="related:"><span>related:</span><input type="text" placeholder="example.com"></div><div class="dork-desc">Encuentra sitios relacionados al dominio.</div></div>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="source:"><span>source:</span><input type="text" placeholder="bbc.com"></div><div class="dork-desc">Limita resultados a una fuente de noticias.</div></div>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="inpostauthor:"><span>inpostauthor:</span><input type="text" placeholder="John Doe"></div><div class="dork-desc">Filtra resultados por autor de blog.</div></div>
+      <div class="dork-option"><div class="dork-label"><input type="checkbox" value="inposttitle:"><span>inposttitle:</span><input type="text" placeholder="security"></div><div class="dork-desc">Filtra entradas de blog por título.</div></div>
+    </details>
+    <div class="actions">
+      <button id="buscar">GENERAR BÚSQUEDA 🔍</button>
+      <button id="guardar">GUARDAR FAVORITO ⭐</button>
+      <button id="reset">RESETEAR FORMULARIO 🗑️</button>
+      <button id="exportar">EXPORTAR FAVORITOS 📤</button>
+      <button id="import-btn">IMPORTAR FAVORITOS 📥</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none">
+    </div>
+    <div class="result" id="resultado"></div>
+    <div class="favorites">
+      <h3>Favoritos:</h3>
+      <ul id="favoritos"></ul>
+    </div>
+  </div>
+  <div class="actions" style="text-align:center; margin-top:20px;">
+    <button id="linkedin-btn">Visita mi LinkedIn</button>
+  </div>
+  <footer>Autor: <a href="https://www.linkedin.com/in/alejandro-freire-gonzález-6b8157338/" target="_blank" style="color:#00ffcc; text-decoration:none;">Alejandro Freire</a> · Versión beta 1.0 · Última actualización: 2025-04-18</footer>
+  <script>
+    function generarConsulta(){ let k=document.getElementById('keywords').value.trim(),f=document.getElementById('keywordFilter').value; if(f==='exact')k=`"${k}"`;if(f==='any')k=k.split(/\s+/).join(' OR ');if(f==='all')k=k.split(/\s+/).join(' ');let q='';document.querySelectorAll('.dork-option').forEach(o=>{let c=o.querySelector('input[type="checkbox"]'),t=o.querySelector('input[type="text"]');if(c.checked&&t.value.trim()){if(c.value==='around:')q+=`"${k}" AROUND(${t.value.trim()}) "${k}" `;else q+=`${c.value}${t.value.trim()} `;}});return(q+k).trim(); }
+    function mostrarFavoritos(){let f=JSON.parse(localStorage.getItem('favoritos'))||[],u=document.getElementById('favoritos');u.innerHTML='';f.forEach((e,i)=>{let l=document.createElement('li');l.innerHTML=`<code>${e}</code> <a href="https://www.google.com/search?q=${encodeURIComponent(e)}" target="_blank">🔍</a> <button onclick="eliminarFavorito(${i})">✖</button>`;u.appendChild(l);});}
+    function guardarFavorito(){let x=generarConsulta(),b=JSON.parse(localStorage.getItem('favoritos'))||[];b.push(x);localStorage.setItem('favoritos',JSON.stringify(b));mostrarFavoritos();}
+    function eliminarFavorito(i){let b=JSON.parse(localStorage.getItem('favoritos'))||[];b.splice(i,1);localStorage.setItem('favoritos',JSON.stringify(b));mostrarFavoritos();}
+    function exportarFavoritos(){let b=JSON.parse(localStorage.getItem('favoritos'))||[];let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(b,null,2)],{type:'application/json'}));a.download='favoritos_osint.json';a.click();}
+    function importarFavoritos(){let f=document.getElementById('import-file').files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(Array.isArray(d)){localStorage.setItem('favoritos',JSON.stringify(d));mostrarFavoritos();}}catch{}};r.readAsText(f);}    
+    function resetForm(){document.getElementById('keywords').value='';document.getElementById('keywordFilter').selectedIndex=0;document.querySelectorAll('.dork-option').forEach(o=>{o.querySelector('input[type="checkbox"]').checked=false;o.querySelector('input[type="text"]').value='';});document.getElementById('resultado').innerHTML='';}
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.getElementById('buscar').addEventListener('click',()=>{const r=document.getElementById('resultado');r.innerHTML=`<code>${generarConsulta()}</code> <a href="https://www.google.com/search?q=${encodeURIComponent(generarConsulta())}" target="_blank">🔍</a>`;r.classList.add('visible');});
+      document.getElementById('guardar').addEventListener('click',guardarFavorito);
+      document.getElementById('reset').addEventListener('click',resetForm);
+      document.getElementById('exportar').addEventListener('click',exportarFavoritos);
+      document.getElementById('import-btn').addEventListener('click',()=>document.getElementById('import-file').click());
+      document.getElementById('import-file').addEventListener('change',importarFavoritos);
+      document.getElementById('linkedin-btn').addEventListener('click',()=>window.open("https://www.linkedin.com/in/alejandro-freire-gonzález-6b8157338/"));
+      mostrarFavoritos();
+    });
+  </script>
+</body>
+</html>
